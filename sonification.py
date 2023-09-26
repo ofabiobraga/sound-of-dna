@@ -10,7 +10,7 @@ class Sonification:
         self.duration = round(len(dna.sequence()) / (self.frequency['G'] + self.frequency['C']) * 100)
         self.ratio = dna.ratio()
 
-    def lead(self, instrument=0, scale=None) -> list:
+    def lead(self, instrument=83, scale=None) -> list:
         """
         """
         codons = self.dna.codons()
@@ -32,15 +32,39 @@ class Sonification:
                 'note': mapping[codon],
                 'volume': 100,
                 'time': (1 - self.ratio) * i,
-                'velocity': 100
+                'velocity': (1 - self.ratio)
             })
 
             i += 1
         
         return strings
     
-    def bass(self, instrument=0) -> list:
-        return list()
+    def bass(self, instrument=33, scale=None) -> list:
+        dinucleotides = self.dna.dinucleotides()
+        
+        mapping = Harmonics.map(
+            items=dinucleotides,
+            scale=scale or self.scale,
+            initial_octave=2
+        )
+
+        mapping = Harmonics.to_midi(mapping)
+
+        strings = list()
+
+        i = 1
+        for dinucleotide in dinucleotides:
+            strings.append({
+                'instrument': instrument,
+                'note': mapping[dinucleotide],
+                'volume': 100,
+                'time': (1 - self.ratio) * i,
+                'velocity': (1 - self.ratio)
+            })
+
+            i += 1
+
+        return strings
     
     def percussion(self, instrument=0) -> list:
         return list()
