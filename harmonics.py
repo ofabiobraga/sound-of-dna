@@ -3,20 +3,20 @@ from audiolazy import str2midi
 
 
 class Scale:
-    def chromatic(self):
-        return ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-
-    def blues(self):
-        return ['A', 'C', 'D', 'D#', 'E', 'G']
-    
-    def a_sharp(self):
-        return ['F#', 'G#', 'A', 'B', 'C#', 'D', 'A#']
-    
-    def d_sharp_minor_harmonic(self):
+    def default():
         return ['C', 'D', 'D#', 'F', 'G', 'G#', 'A#']
 
+    def chromatic():
+        return ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+
+    def blues():
+        return ['A', 'C', 'D', 'D#', 'E', 'G']
+    
+    def a_sharp():
+        return ['F#', 'G#', 'A', 'B', 'C#', 'D', 'A#']
+
 class Harmonics:
-    def map(self, items, scale=Scale().chromatic(), initial_octave=0):
+    def map(items, scale=Scale.chromatic(), initial_octave=0):
         mapping = {element: None for element in items}
         octave = initial_octave
 
@@ -31,7 +31,7 @@ class Harmonics:
                 
         return mapping
     
-    def to_midi(self, mapping):
+    def to_midi(mapping):
         notes = dict()
         for key, note in mapping.items():
             midi = str2midi(note)

@@ -1,16 +1,17 @@
 import sys
-import genoma
-import harmonics as H
+from genoma import Genoma
+from harmonics import Harmonics, Scale
+from sonification import Sonification
 import mido
 from midiutil import MIDIFile
 from mido import MidiFile, MidiFile, MidiTrack
 
 filepath = sys.argv[1]
-harmonics = H.Harmonics()
-scale = H.Scale()
+harmonics = Harmonics()
+scale = Scale()
 
 # DNA attributes
-dna = genoma.Genoma(filepath)
+dna = Genoma(filepath)
 mononucleotides = dna.mononucleotides()
 dinucleotides = dna.dinucleotides()
 codons = dna.codons()
@@ -47,27 +48,16 @@ print('. #4: ---')
 midi = MIDIFile(1)
 midi.addTempo(track=0, time=0, tempo=120)
 
-# Harmonics
-lead_mapping = harmonics.map(
-    items=codons,
-    scale=scale.d_sharp_minor_harmonic(),
-    initial_octave=2
-)
-
-lead_notes = harmonics.to_midi(lead_mapping)
-
-i = 1
-for codon in codons:
+# Building lead track
+for string in Sonification(dna).lead():
     midi.addNote(
-        pitch=lead_notes[codon],
+        pitch=string['note'],
         track=0,
         channel=0,
-        time=(1 - ratio) * i,
-        duration=(1 - ratio),
-        volume=100
+        time=string['time'],
+        duration=string['velocity'],
+        volume=string['volume']
     )
-    
-    i += 1
 
 with open('output.mid', 'wb') as midifile:
     midi.writeFile(midifile)
