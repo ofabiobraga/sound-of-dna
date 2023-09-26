@@ -1,4 +1,5 @@
 import sys
+import time
 from genoma import Genoma
 from harmonics import Harmonics, Scale
 from sonification import Sonification
@@ -59,7 +60,7 @@ for string in Sonification(dna).lead():
         volume=string['volume']
     )
 
-with open('output.mid', 'wb') as midifile:
+with open('./midi/' + str(time.time()) + '.mid', 'wb') as midifile:
     midi.writeFile(midifile)
     
 midi_file = MidiFile('output.mid')

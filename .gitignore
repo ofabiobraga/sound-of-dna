@@ -1,0 +1,4 @@
+**/*.band/
+**/midi/*
+**/.DS_Store
+.DS_Store
