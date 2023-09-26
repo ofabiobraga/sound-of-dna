@@ -42,23 +42,27 @@ print('')
 
 print('[ Frames ]')
 print('. #1 (Lead) Plucked Sweet Synth, Fairytales Bells')
-print('. #2 (Bass) Upright Studio Bass')
+print('. #2 (Bass) Upright Studio Bass, Simple Physics Piano')
 print('. #3 (Percursion) ---')
 print('. #4 (Piano FX) ---')
-print('. #5 (Special FX) ---')
+print('. #5 (Special FX) Breathy Vox, Drifting Away, Glass Sky')
 print('. #6 (Drum Metals) ---')
 
 
-midi = MIDIFile(2)
+midi = MIDIFile(3)
 midi.addTempo(track=0, time=0, tempo=90)
 midi.addTempo(track=1, time=0, tempo=90)
+midi.addTempo(track=2, time=0, tempo=90)
 
 # Defining instruments
-midi.addProgramChange(0, 0, 0, 83)
-midi.addProgramChange(1, 1, 0, 33)
+midi.addProgramChange(0, 0, 0, 95)
+midi.addProgramChange(1, 1, 0, 32)
+midi.addProgramChange(2, 2, 0, 93)
+
+sonification = Sonification(dna)
 
 # Building lead track
-for string in Sonification(dna).lead():
+for string in sonification.lead():
     midi.addNote(
         pitch=string['note'],
         track=0,
@@ -69,7 +73,7 @@ for string in Sonification(dna).lead():
     )
     
 # Building bass track
-for string in Sonification(dna).bass():
+for string in sonification.bass():
     midi.addNote(
         pitch=string['note'],
         track=1,
@@ -78,14 +82,17 @@ for string in Sonification(dna).bass():
         duration=string['velocity'],
         volume=string['volume']
     )
+    
+# Building Special FX track
+for string in sonification.special_fx():
+    midi.addNote(
+        pitch=string['note'],
+        track=2,
+        channel=2,
+        time=string['time'],
+        duration=string['velocity'],
+        volume=string['volume']
+    )
 
 with open(output, 'wb') as midifile:
     midi.writeFile(midifile)
-    
-midi_file = MidiFile(output)
-output_port = mido.open_output('SOD-Output', virtual=True)
-
-for msg in midi_file.play():
-    output_port.send(msg)
-
-output_port.close()

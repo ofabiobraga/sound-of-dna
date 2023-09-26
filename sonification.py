@@ -72,8 +72,56 @@ class Sonification:
     def piano_fx(self, instrument=0) -> list:
         return list()
     
-    def special_fx(self, instrument=0) -> list:
-        return list()
+    def special_fx(self, instrument=0, scale=None) -> list:
+        codons = self.dna.codons()
+        frequencies = self.dna.frequency(codons)
+        polar_codons = [
+            'TCT',
+            'TCC',
+            'TCA',
+            'TCG',
+            'ACT',
+            'ACC',
+            'ACA',
+            'ACG',
+            'TAT',
+            'TAC',
+            'CAA',
+            'CAG',
+            'AAT',
+            'AAC',
+            'TGT',
+            'TGC',
+            'AGT',
+            'AGC',
+        ]
+        
+        start_stop_codons = ['TAA', 'TAG', 'TGA', 'ATG']
+
+        mapping = Harmonics.map(
+            items=polar_codons,
+            scale=scale or self.scale,
+            initial_octave=4
+        )
+
+        mapping = Harmonics.to_midi(mapping)
+
+        strings = list()
+
+        i = 1
+        for codon in codons:
+            if codon in polar_codons:
+                strings.append({
+                    'instrument': instrument,
+                    'note': mapping[codon],
+                    'volume': 100,
+                    'time': (1 - self.ratio) * i,
+                    'velocity': (frequencies[codon] / len(frequencies)) * self.ratio
+                })
+
+            i += 1
+
+        return strings
     
     def drum_metals(self, instrument=0) -> list:
         return list()
