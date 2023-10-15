@@ -3,9 +3,7 @@ import time
 from genoma import Genoma
 from harmonics import Harmonics, Scale
 from sonification import Sonification
-import mido
 from midiutil import MIDIFile
-from mido import MidiFile, MidiFile, MidiTrack
 
 filepath = sys.argv[1]
 output = './midi/'+ str(time.time()) + '.mid'
@@ -54,15 +52,11 @@ midi.addTempo(track=0, time=0, tempo=90)
 midi.addTempo(track=1, time=0, tempo=90)
 midi.addTempo(track=2, time=0, tempo=90)
 
-# Defining instruments
-midi.addProgramChange(0, 0, 0, 95)
-midi.addProgramChange(1, 1, 0, 32)
-midi.addProgramChange(2, 2, 0, 93)
-
 sonification = Sonification(dna)
 
 # Building lead track
 for string in sonification.lead():
+    midi.addProgramChange(0, 0, 0, string['instrument'])
     midi.addNote(
         pitch=string['note'],
         track=0,
@@ -71,9 +65,10 @@ for string in sonification.lead():
         duration=string['velocity'],
         volume=string['volume']
     )
-    
+
 # Building bass track
 for string in sonification.bass():
+    midi.addProgramChange(0, 0, 0, string['instrument'])
     midi.addNote(
         pitch=string['note'],
         track=1,
@@ -82,9 +77,10 @@ for string in sonification.bass():
         duration=string['velocity'],
         volume=string['volume']
     )
-    
+
 # Building Special FX track
 for string in sonification.special_fx():
+    midi.addProgramChange(0, 0, 0, string['instrument'])
     midi.addNote(
         pitch=string['note'],
         track=2,
