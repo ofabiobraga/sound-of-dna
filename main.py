@@ -1,22 +1,38 @@
 import sys
 import time
+import json
 from genoma import Genoma
 from harmonics import Harmonics, Scale
 from sonification import Sonification
 from midiutil import MIDIFile
 
 filepath = sys.argv[1]
-output = './midi/'+ str(time.time()) + '.mid'
 harmonics = Harmonics()
 scale = Scale()
+dna = Genoma(filepath)
 
 # DNA attributes
-dna = Genoma(filepath)
 mononucleotides = dna.mononucleotides()
 dinucleotides = dna.dinucleotides()
 codons = dna.codons()
 frequency = dna.frequency(mononucleotides)
 ratio = dna.ratio()
+
+# Sonification attributes
+sonification = Sonification(dna)
+
+info = {
+    'id': dna.bio().id,
+    'description': dna.bio().description,
+    'codons': dna.codons(),
+    'sonification': {
+        'lead': sonification.lead(),
+        'bass': sonification.bass(),
+        'special_fx': sonification.special_fx(),
+    },
+}
+
+output = './midi/' + info['id'] + '-' + str(time.time())
 
 # Lengths of each sequence
 print('[ Lengths of each sequence ]')
@@ -38,6 +54,7 @@ print('[ Ratio ]')
 print('. GC/AT: ' + str(ratio))
 print('')
 
+# Frames
 print('[ Frames ]')
 print('. #1 (Lead) Plucked Sweet Synth, Fairytales Bells')
 print('. #2 (Bass) Upright Studio Bass, Simple Physics Piano')
@@ -46,16 +63,14 @@ print('. #4 (Piano FX) ---')
 print('. #5 (Special FX) Breathy Vox, Drifting Away, Glass Sky')
 print('. #6 (Drum Metals) ---')
 
-
+# Building midi file
 midi = MIDIFile(3)
 midi.addTempo(track=0, time=0, tempo=90)
 midi.addTempo(track=1, time=0, tempo=90)
 midi.addTempo(track=2, time=0, tempo=90)
 
-sonification = Sonification(dna)
-
-# Building lead track
-for string in sonification.lead():
+# Building Lead track
+for string in info['sonification']['lead']:
     midi.addProgramChange(0, 0, 0, string['instrument'])
     midi.addNote(
         pitch=string['note'],
@@ -66,8 +81,8 @@ for string in sonification.lead():
         volume=string['volume']
     )
 
-# Building bass track
-for string in sonification.bass():
+# Building Bass track
+for string in info['sonification']['bass']:
     midi.addProgramChange(0, 0, 0, string['instrument'])
     midi.addNote(
         pitch=string['note'],
@@ -77,9 +92,9 @@ for string in sonification.bass():
         duration=string['velocity'],
         volume=string['volume']
     )
-
+    
 # Building Special FX track
-for string in sonification.special_fx():
+for string in info['sonification']['special_fx']:
     midi.addProgramChange(0, 0, 0, string['instrument'])
     midi.addNote(
         pitch=string['note'],
@@ -89,6 +104,15 @@ for string in sonification.special_fx():
         duration=string['velocity'],
         volume=string['volume']
     )
+    
+# Building Percussion track (to-do)
+# Building Piano FX (to-do)
+# Building Drum Metals track (to-do)
 
-with open(output, 'wb') as midifile:
+# Saving as .mid file
+with open(output + '.mid', 'wb') as midifile:
     midi.writeFile(midifile)
+    
+# Saving as .json file
+with open(output + '.json', 'w') as jsonfile:
+    json.dump(info, jsonfile)

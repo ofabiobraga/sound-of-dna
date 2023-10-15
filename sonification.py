@@ -28,6 +28,7 @@ class Sonification:
         i = 1
         for codon in codons:
             strings.append({
+                'value': codon,
                 'instrument': instrument,
                 'note': mapping[codon],
                 'volume': 100,
@@ -55,6 +56,7 @@ class Sonification:
         i = 1
         for dinucleotide in dinucleotides:
             strings.append({
+                'value': dinucleotide,
                 'instrument': instrument,
                 'note': mapping[dinucleotide],
                 'volume': 100,
@@ -112,6 +114,7 @@ class Sonification:
         for codon in codons:
             if codon in polar_codons:
                 strings.append({
+                    'value': codon,
                     'instrument': instrument,
                     'note': mapping[codon],
                     'volume': 100,

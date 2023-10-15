@@ -5,6 +5,9 @@ class Genoma:
         self.__raw = Bio.SeqIO.read(filepath, 'fasta')
         self.__sequence = self.__raw.seq
         
+    def bio(self) -> Bio.SeqIO.SeqRecord:
+        return self.__raw
+        
     def sequence(self):
         """
         """
