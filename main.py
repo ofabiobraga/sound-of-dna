@@ -35,7 +35,8 @@ info = {
     'sonification': [
         sonification.one(),
         sonification.two(),
-        sonification.five(),
+        sonification.three(),
+        sonification.four(),
     ],
 }
 
