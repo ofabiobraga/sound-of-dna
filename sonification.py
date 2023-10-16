@@ -10,7 +10,7 @@ class Sonification:
         self.duration = round(len(dna.sequence()) / (self.frequency['G'] + self.frequency['C']) * 100)
         self.ratio = dna.ratio()
 
-    def lead(self, instrument=83, scale=None) -> list:
+    def one(self, instrument=83, scale=None) -> list:
         """
         """
         codons = self.dna.codons()
@@ -43,21 +43,21 @@ class Sonification:
                     'instrument': instrument,
                     'note': mapping[codon],
                     'volume': 100,
-                    'time': (1 - self.ratio) * i,
-                    'velocity': (1 - self.ratio)
+                    'time': (self.ratio) * i,
+                    'velocity': (self.ratio)
                 })
 
             i += 1
 
         return strings
     
-    def bass(self, instrument=33, scale=None) -> list:
+    def two(self, instrument=33, scale=None) -> list:
         dinucleotides = self.dna.dinucleotides()
         
         mapping = Harmonics.map(
             items=dinucleotides,
             scale=scale or self.scale,
-            initial_octave=0
+            initial_octave=1
         )
 
         mapping = Harmonics.to_midi(mapping)
@@ -71,21 +71,21 @@ class Sonification:
                 'instrument': instrument,
                 'note': mapping[dinucleotide],
                 'volume': 100,
-                'time': (1 - self.ratio) * i,
-                'velocity': (1 - self.ratio)
+                'time': (self.ratio) * i,
+                'velocity': (self.ratio)
             })
 
             i += 1
 
         return strings
     
-    def percussion(self, instrument=0) -> list:
+    def three(self, instrument=0) -> list:
         return list()
     
-    def piano_fx(self, instrument=0) -> list:
+    def four(self, instrument=0) -> list:
         return list()
     
-    def special_fx(self, instrument=0, scale=None) -> list:
+    def five(self, instrument=0, scale=None) -> list:
         codons = self.dna.codons()
         frequencies = self.dna.frequency(codons)
         polar_codons = [
@@ -127,7 +127,7 @@ class Sonification:
                     'instrument': instrument,
                     'note': mapping[codon],
                     'volume': 100,
-                    'time': (1 - self.ratio) * i,
+                    'time': (self.ratio) * i,
                     'velocity': (frequencies[codon] / len(frequencies)) * self.ratio
                 })
 
@@ -135,5 +135,5 @@ class Sonification:
 
         return strings
     
-    def drum_metals(self, instrument=0) -> list:
+    def six(self, instrument=0) -> list:
         return list()

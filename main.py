@@ -25,11 +25,18 @@ info = {
     'id': dna.bio().id,
     'description': dna.bio().description,
     'codons': dna.codons(),
-    'sonification': {
-        'lead': sonification.lead(),
-        'bass': sonification.bass(),
-        'special_fx': sonification.special_fx(),
+    'frequencies': {
+        'G': frequency['G'],
+        'A': frequency['A'],
+        'T': frequency['T'],
+        'C': frequency['C'],
     },
+    'gc/at': ratio,
+    'sonification': [
+        sonification.one(),
+        sonification.two(),
+        sonification.five(),
+    ],
 }
 
 output = './midi/' + info['id'] + '-' + str(time.time())
@@ -43,15 +50,15 @@ print('')
 
 # Frequency of each nucleotide
 print('[ Frequency of each nucleotide ]')
-print('. G: ' + str(frequency['G']))
-print('. A: ' + str(frequency['A']))
-print('. T: ' + str(frequency['T']))
-print('. C: ' + str(frequency['C']))
+print('. G: ' + str(info['frequencies']['G']))
+print('. A: ' + str(info['frequencies']['A']))
+print('. T: ' + str(info['frequencies']['T']))
+print('. C: ' + str(info['frequencies']['C']))
 print('')
 
 # Ratios
 print('[ Ratio ]')
-print('. GC/AT: ' + str(ratio))
+print('. GC/AT: ' + str(info['gc/at']))
 print('')
 
 # Frames
@@ -64,50 +71,29 @@ print('. #5 (Special FX) Breathy Vox, Drifting Away, Glass Sky, Worn Tape Piano'
 print('. #6 (Drum Metals) ---')
 
 # Building midi file
-midi = MIDIFile(3)
-midi.addTempo(track=0, time=0, tempo=90)
-midi.addTempo(track=1, time=0, tempo=90)
-midi.addTempo(track=2, time=0, tempo=90)
+midi = MIDIFile(
+    numTracks=len(info['sonification'])
+)
 
-# Building Lead track
-for string in info['sonification']['lead']:
-    midi.addProgramChange(0, 0, 0, string['instrument'])
-    midi.addNote(
-        pitch=string['note'],
-        track=0,
-        channel=0,
-        time=string['time'],
-        duration=string['velocity'],
-        volume=string['volume']
-    )
+channel = 0
+track = 0
 
-# Building Bass track
-for string in info['sonification']['bass']:
-    midi.addProgramChange(1, 1, 0, string['instrument'])
-    midi.addNote(
-        pitch=string['note'],
-        track=1,
-        channel=1,
-        time=string['time'],
-        duration=string['velocity'],
-        volume=string['volume']
-    )
+for strings in info['sonification']:
+    midi.addTempo(track=track, time=0, tempo=140)
 
-# Building Special FX track
-for string in info['sonification']['special_fx']:
-    midi.addProgramChange(2, 2, 0, string['instrument'])
-    midi.addNote(
-        pitch=string['note'],
-        track=2,
-        channel=2,
-        time=string['time'],
-        duration=string['velocity'],
-        volume=string['volume']
-    )
+    for string in strings:
+        midi.addProgramChange(track, channel, 0, string['instrument'])
+        midi.addNote(
+            pitch=string['note'],
+            track=track,
+            channel=channel,
+            time=string['time'],
+            duration=string['velocity'],
+            volume=string['volume']
+        )
 
-# Building Percussion track (to-do)
-# Building Piano FX (to-do)
-# Building Drum Metals track (to-do)
+    channel += 1
+    track += 1
 
 # Saving as .json file
 with open(output + '.json', 'w') as jsonfile:
