@@ -60,7 +60,7 @@ print('. #1 (Lead) Plucked Sweet Synth, Fairytales Bells')
 print('. #2 (Bass) Upright Studio Bass, Simple Physics Piano')
 print('. #3 (Percursion) ---')
 print('. #4 (Piano FX) ---')
-print('. #5 (Special FX) Breathy Vox, Drifting Away, Glass Sky')
+print('. #5 (Special FX) Breathy Vox, Drifting Away, Glass Sky, Worn Tape Piano')
 print('. #6 (Drum Metals) ---')
 
 # Building midi file
@@ -83,7 +83,7 @@ for string in info['sonification']['lead']:
 
 # Building Bass track
 for string in info['sonification']['bass']:
-    midi.addProgramChange(0, 0, 0, string['instrument'])
+    midi.addProgramChange(1, 1, 0, string['instrument'])
     midi.addNote(
         pitch=string['note'],
         track=1,
@@ -92,10 +92,10 @@ for string in info['sonification']['bass']:
         duration=string['velocity'],
         volume=string['volume']
     )
-    
+
 # Building Special FX track
 for string in info['sonification']['special_fx']:
-    midi.addProgramChange(0, 0, 0, string['instrument'])
+    midi.addProgramChange(2, 2, 0, string['instrument'])
     midi.addNote(
         pitch=string['note'],
         track=2,
@@ -104,15 +104,15 @@ for string in info['sonification']['special_fx']:
         duration=string['velocity'],
         volume=string['volume']
     )
-    
+
 # Building Percussion track (to-do)
 # Building Piano FX (to-do)
 # Building Drum Metals track (to-do)
 
-# Saving as .mid file
-with open(output + '.mid', 'wb') as midifile:
-    midi.writeFile(midifile)
-    
 # Saving as .json file
 with open(output + '.json', 'w') as jsonfile:
     json.dump(info, jsonfile)
+
+# Saving as .mid file
+with open(output + '.mid', 'wb') as midifile:
+    midi.writeFile(midifile)

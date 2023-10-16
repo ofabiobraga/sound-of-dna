@@ -23,21 +23,32 @@ class Sonification:
 
         mapping = Harmonics.to_midi(mapping)
         
+        start_codons = ['ATG']
+        stop_codons = ['TAA', 'TAG', 'TGA']
+        stopped = True
+        
         strings = list()
         
         i = 1
         for codon in codons:
-            strings.append({
-                'value': codon,
-                'instrument': instrument,
-                'note': mapping[codon],
-                'volume': 100,
-                'time': (1 - self.ratio) * i,
-                'velocity': (1 - self.ratio)
-            })
+            if stopped and codon in start_codons:
+                stopped = False
+                
+            if not stopped and codon in stop_codons:
+                stopped = True
+
+            if not stopped:
+                strings.append({
+                    'value': codon,
+                    'instrument': instrument,
+                    'note': mapping[codon],
+                    'volume': 100,
+                    'time': (1 - self.ratio) * i,
+                    'velocity': (1 - self.ratio)
+                })
 
             i += 1
-        
+
         return strings
     
     def bass(self, instrument=33, scale=None) -> list:
@@ -46,7 +57,7 @@ class Sonification:
         mapping = Harmonics.map(
             items=dinucleotides,
             scale=scale or self.scale,
-            initial_octave=2
+            initial_octave=0
         )
 
         mapping = Harmonics.to_midi(mapping)
@@ -97,8 +108,6 @@ class Sonification:
             'AGT',
             'AGC',
         ]
-        
-        start_stop_codons = ['TAA', 'TAG', 'TGA', 'ATG']
 
         mapping = Harmonics.map(
             items=polar_codons,
