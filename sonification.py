@@ -94,6 +94,9 @@ class Sonification:
         # Saving as .mid file
         with open('midi/' + outputFilename + '.mid', 'wb') as midifile:
             midi.writeFile(midifile)
+            
+        # Saving as .mp3 file
+        
 
         return response
 
