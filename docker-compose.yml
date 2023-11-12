@@ -3,7 +3,7 @@ version: '3'
 services:
   sound-of-dna-api:
     build:
-      context: .
-      dockerfile: ./.docker/python/Dockerfile
+      context: ./src
+      dockerfile: ../.docker/python/Dockerfile
     ports:
       - "8000:8000"

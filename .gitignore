@@ -1,5 +1,7 @@
-**/*.band/
-**/midi/*
+src/**/*.band/
+src/**/midi/*
+src/**/mp3/*
+src/**/json/*
 **/.DS_Store
 .DS_Store
-uploads/*
+src/uploads/*

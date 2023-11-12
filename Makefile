@@ -1,11 +1,14 @@
+build:
+	@docker-compose build
+
 serve:
-	@python3 -m uvicorn api:api --reload
+	@docker-compose up -d
 
 test:
-	@python3 main.py samples/sars-cov-2.fasta
+	@python3 src/main.py src/samples/sars-cov-2.fasta
 
 install:
-	@pip3 install -r requirements.txt
+	@pip3 install -r src/requirements.txt
 
 clean:
-	@rm -rf midi/* uploads/*
+	@rm -rf src/midi/* src/uploads/*
