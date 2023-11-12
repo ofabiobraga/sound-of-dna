@@ -3,24 +3,28 @@ from genoma import Genoma
 from harmonics import Harmonics, Scale
 from midiutil import MIDIFile
 import time
+import json
 
 class Sonification:
-    def __init__(self, dna, scale=Scale.default()) -> None:
+    def __init__(self, dna, scale=None, bmp=None, instruments=None, strategies=None) -> None:
         
         # Initialize a Genoma instance if the 'dna' argument is a filepath.
         if type(dna) is str:
             dna = Genoma(dna)
 
         self.dna = dna
-        self.scale = scale
+        self.instruments = instruments or [112, 32, 5, 75]
         self.frequency = dna.frequency(dna.mononucleotides())
         self.duration = round(len(dna.sequence()) / (self.frequency['G'] + self.frequency['C']) * 100)
         self.ratio = dna.ratio()
+        self.bmp = bmp or 140
+        self.scaleName = scale or 'default'
+        self.scale = getattr(Scale, self.scaleName)()
         
     def process(self) -> dict:
         """
         """
-        output = 'midi/' + self.dna.bio().id + '-' + str(time.time())
+        outputFilename = self.dna.bio().id + '-' + str(time.time())
         
         frames = [
             self.one(),
@@ -38,7 +42,7 @@ class Sonification:
         track = 0
 
         for strings in frames:
-            midi.addTempo(track=track, time=0, tempo=140)
+            midi.addTempo(track=track, time=0, tempo=self.bmp)
 
             for string in strings:
                 midi.addProgramChange(track, channel, 0, string['instrument'])
@@ -53,12 +57,8 @@ class Sonification:
 
             channel += 1
             track += 1
-
-        # Saving as .mid file
-        with open(output + '.mid', 'wb') as midifile:
-            midi.writeFile(midifile)
-
-        return {
+            
+        response = {
             'id': self.dna.bio().id,
             'description': self.dna.bio().description,
             'frequencies': {
@@ -67,20 +67,44 @@ class Sonification:
                 'T': self.frequency['T'],
                 'C': self.frequency['C'],
             },
+            'length': len(self.dna.sequence()),
             'gc/at': self.dna.ratio(),
-            'midi': 'http://localhost:8000/' + output + '.mid',
+            'scale': self.scaleName,
+            'bmp': self.bmp,
+            'mp3': {
+                'filename': outputFilename + '.mp3',
+                'url':  'http://localhost:8000/mp3/' + outputFilename + '.mp3'
+            },
+            'midi': {
+                'filename': outputFilename + '.mid',
+                'url': 'http://localhost:8000/midi/' + outputFilename + '.mid'
+            },
+            'json' : {
+                'filename': outputFilename + '.json',
+                'url': 'http://localhost:8000/json/' + outputFilename + '.json'
+            },
             'codons': self.dna.codons(),
             'frames': frames
         }
+        
+        # Saving as .json file
+        with open('json/' + outputFilename + '.json', 'w') as jsonfile:
+            json.dump(response, jsonfile)
 
-    def one(self, instrument=112, scale=None) -> list:
+        # Saving as .mid file
+        with open('midi/' + outputFilename + '.mid', 'wb') as midifile:
+            midi.writeFile(midifile)
+
+        return response
+
+    def one(self) -> list:
         """
         """
         codons = self.dna.codons()
     
         mapping = Harmonics.map(
             items=codons,
-            scale=scale or self.scale,
+            scale=self.scale,
             initial_octave=2
         )
 
@@ -103,7 +127,7 @@ class Sonification:
             if not stopped:
                 strings.append({
                     'value': codon,
-                    'instrument': instrument,
+                    'instrument': self.instruments[0],
                     'note': mapping[codon],
                     'volume': 100,
                     'time': (self.ratio) * i,
@@ -114,12 +138,12 @@ class Sonification:
 
         return strings
     
-    def two(self, instrument=32, scale=None) -> list: # 32
+    def two(self) -> list: # 32
         dinucleotides = self.dna.dinucleotides()
         
         mapping = Harmonics.map(
             items=dinucleotides,
-            scale=scale or self.scale,
+            scale=self.scale,
             initial_octave=1
         )
 
@@ -131,7 +155,7 @@ class Sonification:
         for dinucleotide in dinucleotides:
             strings.append({
                 'value': dinucleotide,
-                'instrument': instrument,
+                'instrument': self.instruments[1],
                 'note': mapping[dinucleotide],
                 'volume': 100,
                 'time': (self.ratio) * i,
@@ -142,7 +166,7 @@ class Sonification:
 
         return strings
     
-    def three(self, instrument=5, scale=None) -> list:
+    def three(self) -> list:
         codons = self.dna.codons()
         frequencies = self.dna.frequency(codons)
         polar_codons = [
@@ -168,7 +192,7 @@ class Sonification:
 
         mapping = Harmonics.map(
             items=polar_codons,
-            scale=scale or self.scale,
+            scale=self.scale,
             initial_octave=4
         )
 
@@ -181,7 +205,7 @@ class Sonification:
             if codon in polar_codons:
                 strings.append({
                     'value': codon,
-                    'instrument': instrument,
+                    'instrument': self.instruments[2],
                     'note': mapping[codon],
                     'volume': 100,
                     'time': (self.ratio) * i,
@@ -192,7 +216,7 @@ class Sonification:
 
         return strings
     
-    def four(self, instrument=75, scale=None) -> list:
+    def four(self) -> list:
         codons = self.dna.codons()
         frequencies = self.dna.frequency(codons)
         basic_codons = ['CAT', 'CAC', 'CGT', 'CGC', 'CGA', 'CGG']
@@ -207,7 +231,7 @@ class Sonification:
 
         mapping = Harmonics.map(
             items=codons,
-            scale=scale or self.scale,
+            scale=self.scale,
             initial_octave=4
         )
 
@@ -226,7 +250,7 @@ class Sonification:
             if not stopped and codon in basic_codons:
                 strings.append({
                     'value': codon,
-                    'instrument': instrument,
+                    'instrument': self.instruments[3],
                     'note': mapping[codon],
                     'volume': 100,
                     'time': (self.ratio) * i,
