@@ -2,8 +2,28 @@ version: '3'
 
 services:
   sound-of-dna-api:
+    container_name: sound-of-dna-api
     build:
       context: ./src
       dockerfile: ../.docker/python/Dockerfile
+    volumes:
+      - .:/app
     ports:
       - "8000:8000"
+
+  sound-of-dna-ui:
+    container_name: sound-of-dna-ui
+    build:
+      context: ./ui
+      dockerfile: ../.docker/node/Dockerfile
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    networks:
+      - sound-of-dna-network
+
+networks:
+  sound-of-dna-network:
+    driver: bridge
+  
