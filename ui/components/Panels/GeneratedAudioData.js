@@ -6,8 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DownloadIcon, PlayIcon } from "@radix-ui/react-icons";
 import { PiFileAudioBold, PiFileCodeBold, PiMusicNotesBold } from "react-icons/pi";
+import { GlobalContext } from "@/context/GlobalContext";
 
-const GeneratedAudioData = ({ mp3, midi, json }) => {
+const GeneratedAudioData = () => {
+    const { globalState, setGlobalState } = React.useContext(GlobalContext)
+
     return (
         <Card style = {{ border: 'none' }} className = "shadow-none" >
             <CardHeader>
@@ -26,7 +29,7 @@ const GeneratedAudioData = ({ mp3, midi, json }) => {
                                     <p className="text-sm font-medium leading-none">
                                         MP3
                                     </p>
-                                    <p className="text-xs text-muted-foreground">{mp3.filename}</p>
+                                    <p className="text-xs text-muted-foreground">{globalState.response.mp3.filename}</p>
                                 </div>
                             </div>
                             <div className="flex items-center space-x-1">
@@ -34,7 +37,7 @@ const GeneratedAudioData = ({ mp3, midi, json }) => {
                                     <PlayIcon className="h-4 w-4 mr-1" />
                                     Play
                                 </Button>
-                                <Link href={mp3.url} target="_blank" download>
+                                <Link href={globalState.response.mp3.url} target="_blank" download>
                                     <Button>
                                         <DownloadIcon className="h-4 w-4 mr-1" />
                                         Download
@@ -49,7 +52,7 @@ const GeneratedAudioData = ({ mp3, midi, json }) => {
                                     <p className="text-sm font-medium leading-none">
                                         Midi
                                     </p>
-                                    <p className="text-xs text-muted-foreground">{midi.filename}</p>
+                                    <p className="text-xs text-muted-foreground">{globalState.response.midi.filename}</p>
                                 </div>
                             </div>
                             <div className="flex items-center space-x-1">
@@ -57,7 +60,7 @@ const GeneratedAudioData = ({ mp3, midi, json }) => {
                                     <PlayIcon className="h-4 w-4 mr-1" />
                                     Play
                                 </Button>
-                                <Link href={midi.url} target="_blank" download>
+                                <Link href={globalState.response.midi.url} target="_blank" download>
                                     <Button>
                                         <DownloadIcon className="h-4 w-4 mr-1" />
                                         Download
@@ -72,11 +75,11 @@ const GeneratedAudioData = ({ mp3, midi, json }) => {
                                     <p className="text-sm font-medium leading-none">
                                         JSON
                                     </p>
-                                    <p className="text-xs text-muted-foreground">{json.filename}</p>
+                                    <p className="text-xs text-muted-foreground">{globalState.response.json.filename}</p>
                                 </div>
                             </div>
                             <div className="flex items-center space-x-1">
-                                <Link href={json.url} target="_blank" download>
+                                <Link href={globalState.response.json.url} target="_blank" download>
                                     <Button>
                                         <DownloadIcon className="h-4 w-4 mr-1" />
                                         Download

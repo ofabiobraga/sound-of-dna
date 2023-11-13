@@ -3,17 +3,19 @@
 import * as React from "react"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
+import { GlobalContext } from "@/context/GlobalContext"
 
 const ScaleSelector = () => {
+    const { globalState, setGlobalState } = React.useContext(GlobalContext)
 
-    const handleOnValueChange = (event) => {
-        console.log(event)
+    const handleOnValueChange = (scale) => {
+        setGlobalState({ ...globalState, request: {...globalState?.request, scale: scale}})
     }
 
     return (
         <>
-            <Label htmlFor="temperature">Scale</Label>
-            <Select onValueChange={handleOnValueChange} defaultValue="default">
+            <Label htmlFor="scale">Scale</Label>
+            <Select onValueChange={handleOnValueChange} defaultValue={ globalState.response.scale }>
                 <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Select a scale" />
                 </SelectTrigger>
