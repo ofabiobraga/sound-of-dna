@@ -21,7 +21,10 @@ $(document).ready(() => {
     const btnUpdateSonification = $('#btnUpdateSonification')
 
     const playerMidi = $('#playerMidi')
-    const playerMp3 = $('#playerMp3')
+
+    let frames = []
+    let toPlayFrames = []
+    let toPlayNotes = []
 
     btnUploadFastaFile.click((e) => {
         e.preventDefault()
@@ -36,7 +39,7 @@ $(document).ready(() => {
             inputFastaFile.click()
         }
 
-        spinner.show()
+        spinner.show('fast')
         btnUploadFastaFile.attr('disabled', true)
 
         let data = new FormData
@@ -45,8 +48,8 @@ $(document).ready(() => {
         requestSonificationData(data)
             .then((response) => {
                 fillSonificationParameters(response)
-                sectionStart.toggle()
-                sectionSonification.toggle()
+                sectionStart.slideToggle(1000)
+                sectionSonification.show(500)
             }).catch((error) => {
                 console.log(error)
                 btnUploadFastaFile.attr('disabled', false)
@@ -110,6 +113,57 @@ $(document).ready(() => {
             })
     })
 
+    const configurePlayerMidi = () => {
+        const __pitchToNoteName = (pitch) => {
+            const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            const noteIndex = (pitch + 9) % 12;
+            const octave = Math.floor((pitch + 9) / 12) - 1;
+
+            return `${noteNames[noteIndex]}${octave}`;
+        }
+
+        playerMidi[0].addEventListener('load', (event) => {
+            toPlayNotes = $('#playerMidi')[0].ns.notes
+
+            toPlayFrames[0] = toPlayNotes.filter((note) => note.instrument == 0)
+            toPlayFrames[1] = toPlayNotes.filter((note) => note.instrument == 1)
+            toPlayFrames[2] = toPlayNotes.filter((note) => note.instrument == 2)
+            toPlayFrames[3] = toPlayNotes.filter((note) => note.instrument == 3)
+        })
+
+        playerMidi[0].addEventListener('note', (event) => {
+            let playedNote = event.detail.note
+            let playedFrame = playedNote.instrument
+            let otherFrames = [0, 1, 2, 3].filter((frame) => frame != playedFrame)
+            let playedCodon = frames[playedFrame][toPlayFrames[playedFrame].indexOf(playedNote)]
+            let frameColorMapping = ['warning', 'success', 'danger', 'primary']
+            let element = $(document.createElement('button'))
+                .addClass('col-md-2 btn btn-sm btn-' + frameColorMapping[playedFrame])
+                .html(playedCodon.value + ' <span class="badge text-bg-light">' + __pitchToNoteName(playedNote.pitch) + '</span>')
+                .hide()
+
+            $('#liInstrument_' + playedFrame).append(element)
+            
+            element.fadeIn('fast')
+
+            if ($('#liInstrument_' + playedFrame).children().length > 5) {
+                $('#liInstrument_' + playedFrame).children().first().remove()
+            }
+
+            otherFrames.forEach((otherFrame) => {
+                let element = $(document.createElement('button'))
+                    .addClass('col-md-2 btn btn-sm btn-light')
+                    .html('.')
+
+                if ($('#liInstrument_' + otherFrame).children().length > 5) {
+                    $('#liInstrument_' + otherFrame).children().first().remove()
+                }
+                
+                $('#liInstrument_' + otherFrame).append(element)
+            })
+        })
+    }
+
     const requestSonificationData = async (data) => {
         return await $.ajax({
             url: 'http://localhost:8000',
@@ -142,5 +196,9 @@ $(document).ready(() => {
         })
 
         playerMidi.attr('src', data.midi.url)
+
+        frames = data.frames
     }
+
+    configurePlayerMidi()
 })

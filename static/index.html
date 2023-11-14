@@ -190,9 +190,15 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <midi-player id="playerMidi" src="https://magenta.github.io/magenta-js/music/demos/melody.mid" sound-font visualizer="#myVisualizer"></midi-player>
+                            <midi-player id="playerMidi" sound-font visualizer="#myVisualizer"></midi-player>
                         </div>
                     </div>
+                    <ul class="list-group list-group-flush overflow-x-hidden">
+                        <li class="list-group-item row" id="liInstrument_0"></li>
+                        <li class="list-group-item row" id="liInstrument_1"></li>
+                        <li class="list-group-item row" id="liInstrument_2"></li>
+                        <li class="list-group-item row" id="liInstrument_3"></li>
+                    </ul>
                     <div class="card-footer">
                         <div class="d-flex align-items-center justify-content-center gap-2">
                             <a type="button" class="btn btn-dark btn-sm mr-2" id="btnDownloadMp3File">
