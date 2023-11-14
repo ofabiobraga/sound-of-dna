@@ -48,6 +48,8 @@ export default function PlaygroundPage() {
     })
   }
 
+  console.log(globalState)
+
   return (
     <GlobalContext.Provider value={{ globalState, setGlobalState }}>
       <div className="h-full flex-col flex">
@@ -78,8 +80,6 @@ export default function PlaygroundPage() {
                   Upload
                 </Button>
                 <Input id="file" type="file" onChange={handleFileUpload} ref={fileInput} style={{ display: 'none' }} accept=".fasta" />
-                <span className="ml-2 mr-2">or</span>
-                <PresetSelector />
               </div>}
             </div>
           </div>}

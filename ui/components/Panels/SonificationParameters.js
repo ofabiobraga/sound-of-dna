@@ -20,7 +20,7 @@ const SonificationParameters = () => {
                 </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6">
-                <div className="hidden flex-col space-y-4 sm:flex md:order-2">
+                <div className="flex-col space-y-4">
                     <ScaleSelector />
 
                     <Separator />

@@ -2,11 +2,13 @@ FROM node:20.7.0
 
 WORKDIR /app/ui
 
-COPY package.json /app/ui
-COPY package-lock.json /app/ui
+COPY package.json ./package.json
+COPY package-lock.json ./package-lock.json
 
-RUN npm install
+RUN npm i install
 
-COPY . /app/ui
+ENV PATH ./node_modules/.bin:$PATH
+
+COPY . .
 
 CMD ["npm", "run", "dev"]
