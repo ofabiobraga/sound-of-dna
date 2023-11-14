@@ -20,6 +20,9 @@ $(document).ready(() => {
     const btnPlayMidiFile = $('#btnPlayMidiFile')
     const btnUpdateSonification = $('#btnUpdateSonification')
 
+    const playerMidi = $('#playerMidi')
+    const playerMp3 = $('#playerMp3')
+
     btnUploadFastaFile.click((e) => {
         e.preventDefault()
         inputFastaFile.click()
@@ -137,5 +140,7 @@ $(document).ready(() => {
         inputsStrategies.each((i) => {
             $(inputsStrategies[i]).val(data.strategies[i])
         })
+
+        playerMidi.attr('src', data.midi.url)
     }
 })
