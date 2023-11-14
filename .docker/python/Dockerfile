@@ -8,6 +8,7 @@ WORKDIR /app
 COPY requirements.txt /app
 
 # Instala as dependências
+RUN apt-get update && apt-get install -y --no-install-recommends fluidsynth
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copia os arquivos restantes

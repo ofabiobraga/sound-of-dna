@@ -4,3 +4,4 @@ uvicorn==0.23.2
 audiolazy==0.6
 biopython==1.79
 python-multipart==0.0.6
+midi2audio

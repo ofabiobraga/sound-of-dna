@@ -2,6 +2,7 @@
 from genoma import Genoma
 from harmonics import Harmonics, Scale
 from midiutil import MIDIFile
+from midi2audio import FluidSynth
 import time
 import json
 
@@ -102,8 +103,8 @@ class Sonification:
         with open('midi/' + outputFilename + '.mid', 'wb') as midifile:
             midi.writeFile(midifile)
             
-        # TODO: Saving as .mp3 file
-        
+        # Saving as .mp3 file
+        # (FluidSynth()).midi_to_audio('midi/' + outputFilename + '.mid', 'mp3/' + outputFilename + '.mp3')
 
         return response
 
