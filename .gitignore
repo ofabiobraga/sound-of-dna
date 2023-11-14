@@ -1,8 +1,8 @@
-src/**/*.band/
-src/**/midi/*
-src/**/mp3/*
-src/**/json/*
-src/__pycache__/*
+**/*.band/
+**/midi/*
+**/mp3/*
+**/json/*
+__pycache__/*
 **/.DS_Store
 .DS_Store
-src/uploads/*
+uploads/*

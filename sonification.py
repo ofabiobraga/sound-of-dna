@@ -20,6 +20,7 @@ class Sonification:
         self.bmp = bmp or 140
         self.scaleName = scale or 'default'
         self.scale = getattr(Scale, self.scaleName)()
+        self.strategies = strategies or ['one', 'two', 'three', 'four']
         
     def process(self) -> dict:
         """
@@ -27,10 +28,10 @@ class Sonification:
         outputFilename = self.dna.bio().id + '-' + str(time.time())
         
         frames = [
-            self.one(),
-            self.two(),
-            self.three(),
-            self.four()
+            getattr(self, self.strategies[0])(),
+            getattr(self, self.strategies[1])(),
+            getattr(self, self.strategies[2])(),
+            getattr(self, self.strategies[3])(),
         ]
 
         # Building midi file
@@ -71,6 +72,7 @@ class Sonification:
             'gc/at': self.dna.ratio(),
             'scale': self.scaleName,
             'bmp': self.bmp,
+            'strategies': self.strategies,
             'mp3': {
                 'filename': outputFilename + '.mp3',
                 'url':  'http://localhost:8000/mp3/' + outputFilename + '.mp3'
@@ -87,6 +89,11 @@ class Sonification:
             'frames': frames
         }
         
+        for frame in frames:
+            for string in frame:
+                if not isinstance(string['instrument'], int):
+                    print(string)
+        
         # Saving as .json file
         with open('json/' + outputFilename + '.json', 'w') as jsonfile:
             json.dump(response, jsonfile)
@@ -95,7 +102,7 @@ class Sonification:
         with open('midi/' + outputFilename + '.mid', 'wb') as midifile:
             midi.writeFile(midifile)
             
-        # Saving as .mp3 file
+        # TODO: Saving as .mp3 file
         
 
         return response
@@ -130,7 +137,7 @@ class Sonification:
             if not stopped:
                 strings.append({
                     'value': codon,
-                    'instrument': self.instruments[0],
+                    'instrument': int(self.instruments[0]),
                     'note': mapping[codon],
                     'volume': 100,
                     'time': (self.ratio) * i,
@@ -158,7 +165,7 @@ class Sonification:
         for dinucleotide in dinucleotides:
             strings.append({
                 'value': dinucleotide,
-                'instrument': self.instruments[1],
+                'instrument': int(self.instruments[1]),
                 'note': mapping[dinucleotide],
                 'volume': 100,
                 'time': (self.ratio) * i,
@@ -208,7 +215,7 @@ class Sonification:
             if codon in polar_codons:
                 strings.append({
                     'value': codon,
-                    'instrument': self.instruments[2],
+                    'instrument': int(self.instruments[2]),
                     'note': mapping[codon],
                     'volume': 100,
                     'time': (self.ratio) * i,
@@ -253,7 +260,7 @@ class Sonification:
             if not stopped and codon in basic_codons:
                 strings.append({
                     'value': codon,
-                    'instrument': self.instruments[3],
+                    'instrument': int(self.instruments[3]),
                     'note': mapping[codon],
                     'volume': 100,
                     'time': (self.ratio) * i,

@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from typing import Annotated, Union
 from pathlib import Path
 from sonification import Sonification
@@ -17,6 +18,13 @@ api.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+api.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+@api.get('/')
+async def index():
+    return FileResponse('static/index.html')
 
 @api.post('/')
 async def post(
