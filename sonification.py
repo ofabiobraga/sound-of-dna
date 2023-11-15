@@ -45,9 +45,9 @@ class Sonification:
 
         for strings in frames:
             midi.addTempo(track=track, time=0, tempo=self.bmp)
+            midi.addProgramChange(track, channel, 0, int(self.instruments[track]))
 
             for string in strings:
-                midi.addProgramChange(track, channel, 0, string['instrument'])
                 midi.addNote(
                     pitch=string['note'],
                     track=track,
