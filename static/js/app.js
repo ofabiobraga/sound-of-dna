@@ -5,7 +5,7 @@ $(document).ready(() => {
     const inputFastaFile = $('#inputFastaFile')
     const inputBmp = $('#inputBmp')
     const inputScale = $('#inputScale')
-    const inputsInstruments = $('input[id^=inputInstruments_]')
+    const inputsInstruments = $('select[id^=inputInstruments_]')
     const inputsStrategies = $('select[id^=inputsStrategies_]')
 
     const textMp3Filename = $('#textMp3Filename')
@@ -21,6 +21,167 @@ $(document).ready(() => {
     const btnUpdateSonification = $('#btnUpdateSonification')
 
     const playerMidi = $('#playerMidi')
+
+    const midiIntrumentCodes = {
+        "Piano": {
+            0: "Acoustic Grand Piano",
+            1: "Bright Acoustic Piano",
+            2: "Electric Grand Piano",
+            3: "Honky-tonk Piano",
+            4: "Rhodes Piano",
+            5: "Chorused Piano",
+            6: "Harpsichord",
+            7: "Clavinet"
+        },
+        "Chormatic Percussion": {
+            8: "Celesta",
+            9: "Glockenspiel",
+            10: "Music Box",
+            11: "Vibraphone",
+            12: "Marimba",
+            13: "Xylophone",
+            14: "Tubular Bells",
+            15: "Dulcimer",
+        },
+        "Organ Timbres": {
+            16: "Hammond Organ",
+            17: "Percussive Organ",
+            18: "Rock Organ",
+            19: "Church Organ",
+            20: "Reed Organ",
+            21: "Accordion",
+            22: "Harmonica",
+            23: "Tango Accordion",
+        },
+        "Guitar Timbres": {
+            24: "Acoustic Nylon Guitar",
+            25: "Acoustic Steel Guitar",
+            26: "Electric Jazz Guitar",
+            27: "Electric Clean Guitar",
+            28: "Electric Muted Guitar",
+            29: "Overdriven Guitar",
+            30: "Distortion Guitar",
+            31: "Guitar Harmonics",
+        },
+        "Bass Timbres": {
+            32: "Acoustic Bass",
+            33: "Fingered Electric Bass",
+            34: "Plucked Electric Bass",
+            35: "Fretless Bass",
+            36: "Slap Bass 1",
+            37: "Slap Bass 2",
+            38: "Synth Bass 1",
+            39: "Synth Bass 2",
+        },
+        "String Timbres": {
+            40: "Violin",
+            41: "Viola",
+            42: "Cello",
+            43: "Contrabass",
+            44: "Tremolo Strings",
+            45: "Pizzicato Strings",
+            46: "Orchestral Harp",
+            47: "Timpani",
+        },
+        "Ensemble Timbres": {
+            48: "String Ensemble 1",
+            49: "String Ensemble 2",
+            50: "Synth Strings 1",
+            51: "Synth Strings 2",
+            52: "Choir Aah",
+            53: "Choir Ooh",
+            54: "Synth Voice",
+            55: "Orchestral Hit",
+        },
+        "Brass Timbres": {
+            56: "Trumpet",
+            57: "Trombone",
+            58: "Tuba",
+            59: "Muted Trumpet",
+            60: "French Horn",
+            61: "Brass Section",
+            62: "Synth Brass 1",
+            63: "Synth Brass 2",
+        },
+        "Reed Timbres": {
+            64: "Soprano Sax",
+            65: "Alto Sax",
+            66: "Tenor Sax",
+            67: "Baritone Sax",
+            68: "Oboe",
+            69: "English Horn",
+            70: "Bassoon",
+            71: "Clarinet",
+        },
+        "Pipe Timbres": {
+            72:	"Piccolo",
+            73:	"Flute",
+            74:	"Recorder",
+            75:	"Pan Flute",
+            76:	"Bottle Blow",
+            77:	"Shakuhachi",
+            78:	"Whistle",
+            79:	"Ocarina",
+        },
+        "Synth Lead": {
+            80:	"Square Wave Lead",
+            81:	"Sawtooth Wave Lead",
+            82:	"Calliope Lead",
+            83:	"Chiff Lead",
+            84:	"Charang Lead",
+            85:	"Voice Lead",
+            86:	"Fifths Lead",
+            87:	"Bass Lead",
+        },
+        "Synth Pad": {
+            88:	"New Age Pad",
+            89:	"Warm Pad",
+            90:	"Polysynth Pad",
+            91:	"Choir Pad",
+            92:	"Bowed Pad",
+            93:	"Metallic Pad",
+            94:	"Halo Pad",
+            95:	"Sweep Pad",
+        },
+        "Synth Effects": {
+            96: "Rain Effect",
+            97: "Soundtrack Effect",
+            98: "Crystal Effect",
+            99: "Atmosphere Effect",
+            100: "Brightness Effect",
+            101: "Goblins Effect",
+            102: "Echoes Effect",
+            103: "Sci - Fi Effect",
+        },
+        "Ethnic Timbres": {
+            104: "Sitar",
+            105: "Banjo",
+            106: "Shamisen",
+            107: "Koto",
+            108: "Kalimba",
+            109: "Bagpipe",
+            110: "Fiddle",
+            111: "Shanai",
+        },
+        "Sound Effects": {
+            112: "Tinkle Bell",
+            113: "Agogo",
+            114: "Steel Drums",
+            115: "Woodblock",
+            116: "Taiko Drum",
+            117: "Melodic Tom",
+            118: "Synth Drum",
+            119: "Reverse Cymbal",
+            120: "Guitar Fret Noise",
+            121: "Breath Noise",
+            122: "Seashore",
+            123: "Bird Tweet",
+            124: "Telephone Ring",
+            125: "Helicopter",
+            126: "Applause",
+            127: "Gun Shot",
+        },
+    }
 
     let frames = []
     let toPlayFrames = []
@@ -93,14 +254,14 @@ $(document).ready(() => {
             strategies[i] = input.value
         })
 
+        console.log(instruments)
+
         let data = new FormData
         data.append('file', file)
         data.append('bmp', inputBmp.val())
         data.append('scale', inputScale.val())
         data.append('instruments', JSON.stringify(instruments))
         data.append('strategies', JSON.stringify(strategies))
-
-        console.log(data)
 
         requestSonificationData(data)
             .then((response) => {
@@ -112,6 +273,31 @@ $(document).ready(() => {
                 btnUpdateSonification.attr('disabled', false)
             })
     })
+
+    const buildSelectInstruments = () => {
+        inputsInstruments.each((index, element) => {
+            for (instrumentGroup in midiIntrumentCodes) {
+                let optionGroup = $(document.createElement('optgroup'))
+                    .attr('label', instrumentGroup)
+
+                for (instrumentCode in midiIntrumentCodes[instrumentGroup]) {
+                    let option = $(document.createElement('option'))
+                        .attr('value', instrumentCode)
+                        .text(midiIntrumentCodes[instrumentGroup][instrumentCode])
+
+                    console.log(instrumentCode)
+
+                    optionGroup.append(option)
+                }
+
+                $(element).append(optionGroup)
+            }
+
+            
+
+            
+        })
+    }
 
     const configurePlayerMidi = () => {
         const __pitchToNoteName = (pitch) => {
@@ -200,5 +386,6 @@ $(document).ready(() => {
         frames = data.frames
     }
 
+    buildSelectInstruments()
     configurePlayerMidi()
 })
