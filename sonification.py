@@ -21,7 +21,7 @@ class Sonification:
         self.bmp = bmp or int(self.ratio * 200)
         self.scaleName = scale or 'default'
         self.scale = getattr(Scale, self.scaleName)()
-        self.strategies = strategies or ['one', 'two', 'three', 'four']
+        self.strategies = strategies or ['all_start_stop', 'dinucleotides', 'polar_codons', 'basic_start_stop']
         
     def process(self) -> dict:
         """
@@ -108,7 +108,7 @@ class Sonification:
 
         return response
 
-    def one(self) -> list:
+    def all_start_stop(self) -> list:
         """
         """
         codons = self.dna.codons()
@@ -149,7 +149,7 @@ class Sonification:
 
         return strings
     
-    def two(self) -> list: # 32
+    def dinucleotides(self) -> list: # 32
         dinucleotides = self.dna.dinucleotides()
         frequencies = self.dna.frequency(dinucleotides)
         
@@ -181,7 +181,7 @@ class Sonification:
 
         return strings
     
-    def three(self) -> list:
+    def polar_codons(self) -> list:
         codons = self.dna.codons()
         frequencies = self.dna.frequency(codons)
         polar_codons = [
@@ -234,7 +234,7 @@ class Sonification:
 
         return strings
     
-    def four(self) -> list:
+    def basic_start_stop(self) -> list:
         codons = self.dna.codons()
         frequencies = self.dna.frequency(codons)
         basic_codons = ['CAT', 'CAC', 'CGT', 'CGC', 'CGA', 'CGG']
