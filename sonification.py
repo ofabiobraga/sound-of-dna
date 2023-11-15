@@ -165,8 +165,9 @@ class Sonification:
 
         i = 1
         for dinucleotide in dinucleotides:
-            velocity = 32 + frequencies[dinucleotides[i + 1]] / len(frequencies) if i < len(dinucleotides) - 1 else 100
-            velocity = velocity if velocity < 255 else 255
+            velocity = 32 + (frequencies[dinucleotides[i + 1]] / len(dinucleotides)) * 100 if i < len(dinucleotides) - 1 else 100
+            velocity = 255 if velocity > 255 else velocity
+            velocity = velocity + 60 if velocity < 80 else velocity
             
             strings.append({
                 'value': dinucleotide,
@@ -218,7 +219,8 @@ class Sonification:
         i = 1
         for codon in codons:
             velocity = self.ratio * frequencies[codons[i - 1]] if i > 1 else 100
-            velocity = velocity if velocity < 255 else 255
+            velocity = 255 if velocity > 255 else velocity
+            velocity = velocity + 60 if velocity < 80 else velocity
 
             if codon in polar_codons:
                 strings.append({
