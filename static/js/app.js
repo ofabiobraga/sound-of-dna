@@ -11,6 +11,9 @@ $(document).ready(() => {
     const textMp3Filename = $('#textMp3Filename')
     const textMidiFilename = $('#textMidiFilename')
     const textJsonFilename = $('#textJsonFilename')
+    const textBioDescription = $('#textBioDescription')
+    const textBioNucletides = $('#textBioNucletides')
+    const textBioGCATRatio = $('#textBioGCATRatio')
     
     const btnUploadFastaFile = $('#btnUploadFastaFile')
     const btnDownloadMp3File = $('#btnDownloadMp3File')
@@ -368,6 +371,9 @@ $(document).ready(() => {
         textMp3Filename.text(data.mp3.filename)
         textMidiFilename.text(data.midi.filename)
         textJsonFilename.text(data.json.filename)
+        textBioDescription.text(data.description)
+        textBioNucletides.text(data.frequencies['G'] + 'G, ' + data.frequencies['A'] + 'A, ' + data.frequencies['T'] + 'T, and ' + data.frequencies['C'] + 'C')
+        textBioGCATRatio.text(data['gc/at'])
 
         btnDownloadMp3File.attr('href', data.mp3.url)
         btnDownloadMidiFile.attr('href', data.midi.url)
