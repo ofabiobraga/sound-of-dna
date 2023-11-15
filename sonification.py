@@ -18,7 +18,7 @@ class Sonification:
         self.frequency = dna.frequency(dna.mononucleotides())
         self.duration = round(len(dna.sequence()) / (self.frequency['G'] + self.frequency['C']) * 100)
         self.ratio = dna.ratio()
-        self.bmp = bmp or 140
+        self.bmp = bmp or int(self.ratio * 200)
         self.scaleName = scale or 'default'
         self.scale = getattr(Scale, self.scaleName)()
         self.strategies = strategies or ['one', 'two', 'three', 'four']
@@ -53,8 +53,8 @@ class Sonification:
                     track=track,
                     channel=channel,
                     time=string['time'],
-                    duration=string['velocity'],
-                    volume=string['volume']
+                    duration=string['duration'],
+                    volume=string['velocity']
                 )
 
             channel += 1
@@ -140,9 +140,9 @@ class Sonification:
                     'value': codon,
                     'instrument': int(self.instruments[0]),
                     'note': mapping[codon],
-                    'volume': 100,
+                    'velocity': 100,
                     'time': (self.ratio) * i,
-                    'velocity': (self.ratio)
+                    'duration': (self.ratio)
                 })
 
             i += 1
@@ -151,6 +151,7 @@ class Sonification:
     
     def two(self) -> list: # 32
         dinucleotides = self.dna.dinucleotides()
+        frequencies = self.dna.frequency(dinucleotides)
         
         mapping = Harmonics.map(
             items=dinucleotides,
@@ -164,13 +165,16 @@ class Sonification:
 
         i = 1
         for dinucleotide in dinucleotides:
+            velocity = 32 + frequencies[dinucleotides[i + 1]] / len(frequencies) if i < len(dinucleotides) - 1 else 100
+            velocity = velocity if velocity < 255 else 255
+            
             strings.append({
                 'value': dinucleotide,
                 'instrument': int(self.instruments[1]),
                 'note': mapping[dinucleotide],
-                'volume': 100,
+                'velocity': int(velocity),
                 'time': (self.ratio) * i,
-                'velocity': (self.ratio)
+                'duration': (self.ratio)
             })
 
             i += 1
@@ -213,14 +217,17 @@ class Sonification:
 
         i = 1
         for codon in codons:
+            velocity = self.ratio * frequencies[codons[i - 1]] if i > 1 else 100
+            velocity = velocity if velocity < 255 else 255
+
             if codon in polar_codons:
                 strings.append({
                     'value': codon,
                     'instrument': int(self.instruments[2]),
                     'note': mapping[codon],
-                    'volume': 100,
+                    'velocity': int(velocity),
                     'time': (self.ratio) * i,
-                    'velocity': (frequencies[codon] / len(frequencies)) * self.ratio
+                    'duration': (frequencies[codon] / len(frequencies)) * self.ratio
                 })
 
             i += 1
@@ -263,9 +270,9 @@ class Sonification:
                     'value': codon,
                     'instrument': int(self.instruments[3]),
                     'note': mapping[codon],
-                    'volume': 100,
+                    'velocity': 100,
                     'time': (self.ratio) * i,
-                    'velocity': (frequencies[codon] / len(frequencies)) * self.ratio
+                    'duration': (frequencies[codon] / len(frequencies)) * self.ratio
                 })
 
             i += 1
