@@ -32,7 +32,8 @@ async def post(
     scale: Annotated[Union[str, None], Form()] = None,
     bmp: Annotated[Union[str, None], Form()] = None,
     instruments: Annotated[Union[str, None], Form()] = None,
-    strategies: Annotated[Union[str, None], Form()] = None
+    strategies: Annotated[Union[str, None], Form()] = None,
+    initial_octaves: Annotated[Union[str, None], Form()] = None,
     ):
     
     # Checks if the 'uploads' directory exists.
@@ -55,13 +56,17 @@ async def post(
     if strategies is not None:
         strategies = json.loads(strategies)
 
+    if initial_octaves is not None:
+        initial_octaves = json.loads(initial_octaves)
+
     # Gets sonification data.
     sonification = Sonification(
         filepath,
         scale,
         bmp,
         instruments,
-        strategies
+        strategies,
+        initial_octaves
     )
 
     response = sonification.process()

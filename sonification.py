@@ -7,7 +7,7 @@ import time
 import json
 
 class Sonification:
-    def __init__(self, dna, scale=None, bmp=None, instruments=None, strategies=None) -> None:
+    def __init__(self, dna, scale=None, bmp=None, instruments=None, strategies=None, initial_octaves=None) -> None:
         
         # Initialize a Genoma instance if the 'dna' argument is a filepath.
         if type(dna) is str:
@@ -22,6 +22,7 @@ class Sonification:
         self.scaleName = scale or 'default'
         self.scale = getattr(Scale, self.scaleName)()
         self.strategies = strategies or ['all_start_stop', 'dinucleotides', 'polar_codons', 'basic_start_stop']
+        self.initial_octaves = initial_octaves or [2, 1, 4, 4]
         
     def process(self) -> dict:
         """
@@ -74,6 +75,7 @@ class Sonification:
             'scale': self.scaleName,
             'bmp': self.bmp,
             'strategies': self.strategies,
+            'initial_octaves': self.initial_octaves,
             'mp3': {
                 'filename': outputFilename + '.mp3',
                 'url':  'http://localhost:8000/mp3/' + outputFilename + '.mp3'
@@ -116,7 +118,7 @@ class Sonification:
         mapping = Harmonics.map(
             items=codons,
             scale=self.scale,
-            initial_octave=2
+            initial_octave=int(self.initial_octaves[0])
         )
 
         mapping = Harmonics.to_midi(mapping)
@@ -156,7 +158,7 @@ class Sonification:
         mapping = Harmonics.map(
             items=dinucleotides,
             scale=self.scale,
-            initial_octave=1
+            initial_octave=int(self.initial_octaves[1])
         )
 
         mapping = Harmonics.to_midi(mapping)
@@ -209,7 +211,7 @@ class Sonification:
         mapping = Harmonics.map(
             items=polar_codons,
             scale=self.scale,
-            initial_octave=4
+            initial_octave=int(self.initial_octaves[2])
         )
 
         mapping = Harmonics.to_midi(mapping)
@@ -252,7 +254,7 @@ class Sonification:
         mapping = Harmonics.map(
             items=codons,
             scale=self.scale,
-            initial_octave=4
+            initial_octave=int(self.initial_octaves[3])
         )
 
         mapping = Harmonics.to_midi(mapping)

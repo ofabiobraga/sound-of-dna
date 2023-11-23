@@ -7,6 +7,7 @@ $(document).ready(() => {
     const inputScale = $('#inputScale')
     const inputsInstruments = $('select[id^=inputInstruments_]')
     const inputsStrategies = $('select[id^=inputsStrategies_]')
+    const inputsInitialOctaves = $('input[id^=inputInitialOctaves_]')
 
     const textMp3Filename = $('#textMp3Filename')
     const textMidiFilename = $('#textMidiFilename')
@@ -257,7 +258,11 @@ $(document).ready(() => {
             strategies[i] = input.value
         })
 
-        console.log(instruments)
+        let initialOctaves = []
+
+        inputsInitialOctaves.each((i, input) => {
+            initialOctaves[i] = input.value
+        })
 
         let data = new FormData
         data.append('file', file)
@@ -265,6 +270,7 @@ $(document).ready(() => {
         data.append('scale', inputScale.val())
         data.append('instruments', JSON.stringify(instruments))
         data.append('strategies', JSON.stringify(strategies))
+        data.append('initial_octaves', JSON.stringify(initialOctaves))
 
         requestSonificationData(data)
             .then((response) => {
@@ -287,8 +293,6 @@ $(document).ready(() => {
                     let option = $(document.createElement('option'))
                         .attr('value', instrumentCode)
                         .text(midiIntrumentCodes[instrumentGroup][instrumentCode])
-
-                    console.log(instrumentCode)
 
                     optionGroup.append(option)
                 }
@@ -385,6 +389,10 @@ $(document).ready(() => {
 
         inputsStrategies.each((i) => {
             $(inputsStrategies[i]).val(data.strategies[i])
+        })
+
+        inputsInitialOctaves.each((i) => {
+            $(inputsInitialOctaves[i]).val(data.initial_octaves[i])
         })
 
         playerMidi.attr('src', data.midi.url)
