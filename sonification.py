@@ -21,7 +21,7 @@ class Sonification:
         self.bmp = bmp or int(self.ratio * 200)
         self.scaleName = scale or 'default'
         self.scale = getattr(Scale, self.scaleName)()
-        self.strategies = strategies or ['all_start_stop', 'dinucleotides', 'polar_codons', 'basic_start_stop']
+        self.strategies = strategies or ['apolar_codons', 'acidic_codons', 'polar_codons', 'basic_codons']
         self.initial_octaves = initial_octaves or [2, 1, 4, 4]
         
     def process(self) -> dict:
@@ -30,10 +30,10 @@ class Sonification:
         outputFilename = self.dna.bio().id + '-' + str(time.time())
         
         frames = [
-            getattr(self, self.strategies[0])(),
-            getattr(self, self.strategies[1])(),
-            getattr(self, self.strategies[2])(),
-            getattr(self, self.strategies[3])(),
+            getattr(self, self.strategies[0])(int(self.initial_octaves[0]), int(self.instruments[0])),
+            getattr(self, self.strategies[1])(int(self.initial_octaves[1]), int(self.instruments[1])),
+            getattr(self, self.strategies[2])(int(self.initial_octaves[2]), int(self.instruments[2])),
+            getattr(self, self.strategies[3])(int(self.initial_octaves[3]), int(self.instruments[3])),
         ]
 
         # Building midi file
@@ -110,7 +110,7 @@ class Sonification:
 
         return response
 
-    def all_start_stop(self) -> list:
+    def all_start_stop(self, initial_octave, instrument) -> list:
         """
         """
         codons = self.dna.codons()
@@ -118,7 +118,7 @@ class Sonification:
         mapping = Harmonics.map(
             items=codons,
             scale=self.scale,
-            initial_octave=int(self.initial_octaves[0])
+            initial_octave=initial_octave
         )
 
         mapping = Harmonics.to_midi(mapping)
@@ -140,7 +140,7 @@ class Sonification:
             if not stopped:
                 strings.append({
                     'value': codon,
-                    'instrument': int(self.instruments[0]),
+                    'instrument': instrument,
                     'note': mapping[codon],
                     'velocity': 100,
                     'time': (self.ratio) * i,
@@ -151,14 +151,14 @@ class Sonification:
 
         return strings
     
-    def dinucleotides(self) -> list: # 32
+    def dinucleotides(self, initial_octave, instrument) -> list: # 32
         dinucleotides = self.dna.dinucleotides()
         frequencies = self.dna.frequency(dinucleotides)
         
         mapping = Harmonics.map(
             items=dinucleotides,
             scale=self.scale,
-            initial_octave=int(self.initial_octaves[1])
+            initial_octave=initial_octave
         )
 
         mapping = Harmonics.to_midi(mapping)
@@ -173,7 +173,7 @@ class Sonification:
             
             strings.append({
                 'value': dinucleotide,
-                'instrument': int(self.instruments[1]),
+                'instrument': instrument,
                 'note': mapping[dinucleotide],
                 'velocity': int(velocity),
                 'time': (self.ratio) * i,
@@ -184,7 +184,7 @@ class Sonification:
 
         return strings
     
-    def polar_codons(self) -> list:
+    def polar_codons(self, initial_octave, instrument) -> list:
         codons = self.dna.codons()
         frequencies = self.dna.frequency(codons)
         polar_codons = [
@@ -211,7 +211,7 @@ class Sonification:
         mapping = Harmonics.map(
             items=polar_codons,
             scale=self.scale,
-            initial_octave=int(self.initial_octaves[2])
+            initial_octave=initial_octave
         )
 
         mapping = Harmonics.to_midi(mapping)
@@ -227,7 +227,7 @@ class Sonification:
             if codon in polar_codons:
                 strings.append({
                     'value': codon,
-                    'instrument': int(self.instruments[2]),
+                    'instrument': instrument,
                     'note': mapping[codon],
                     'velocity': int(velocity),
                     'time': (self.ratio) * i,
@@ -238,23 +238,15 @@ class Sonification:
 
         return strings
     
-    def basic_start_stop(self) -> list:
+    def basic_codons(self, initial_octave, instrument) -> list:
         codons = self.dna.codons()
         frequencies = self.dna.frequency(codons)
         basic_codons = ['CAT', 'CAC', 'CGT', 'CGC', 'CGA', 'CGG']
-        start_codons = ['ATG']
-        stop_codons = ['TAA', 'TAG', 'TGA']
-        stopped = True
-
-        i = 0
-        for i in range(0, len(codons)):
-            if codons[i] not in [*basic_codons, *start_codons, *stop_codons]:
-                codons[i] = None
 
         mapping = Harmonics.map(
-            items=codons,
+            items=basic_codons,
             scale=self.scale,
-            initial_octave=int(self.initial_octaves[3])
+            initial_octave=initial_octave
         )
 
         mapping = Harmonics.to_midi(mapping)
@@ -263,18 +255,117 @@ class Sonification:
 
         i = 1
         for codon in codons:
-            if stopped and codon in start_codons:
-                stopped = False
-
-            if not stopped and codon in stop_codons:
-                stopped = True
-
-            if not stopped and codon in basic_codons:
+            if codon in basic_codons:
                 strings.append({
                     'value': codon,
-                    'instrument': int(self.instruments[3]),
+                    'instrument': instrument,
                     'note': mapping[codon],
                     'velocity': 100,
+                    'time': (self.ratio) * i,
+                    'duration': (frequencies[codon] / len(frequencies)) * self.ratio
+                })
+
+            i += 1
+
+        return strings
+    
+    def apolar_codons(self, initial_octave, instrument) -> list:
+        codons = self.dna.codons()
+        frequencies = self.dna.frequency(codons)
+        apolar_codons = [
+            'TTT',
+            'TTC',
+            'TTA',
+            'TTG',
+            'CTT',
+            'CTC',
+            'CTA',
+            'CTG',
+            'ATT',
+            'ATC',
+            'ATA',
+            'ATG',
+            'GTT',
+            'GTC',
+            'GTA',
+            'GTG',
+            'CCT',
+            'CCC',
+            'CCA',
+            'CCG',
+            'GCT',
+            'GCC',
+            'GCA',
+            'GCG',
+            'TGG',
+            'GGT',
+            'GGC',
+            'GGA',
+            'GGG',
+        ]
+
+        mapping = Harmonics.map(
+            items=apolar_codons,
+            scale=self.scale,
+            initial_octave=initial_octave
+        )
+
+        mapping = Harmonics.to_midi(mapping)
+
+        strings = list()
+
+        i = 1
+        for codon in codons:
+            velocity = self.ratio * frequencies[codons[i - 1]] if i > 1 else 100
+            velocity = 127 if velocity > 127 else velocity
+            velocity = velocity + 60 if velocity < 80 else velocity
+
+            if codon in apolar_codons:
+                strings.append({
+                    'value': codon,
+                    'instrument': instrument,
+                    'note': mapping[codon],
+                    'velocity': int(velocity),
+                    'time': (self.ratio) * i,
+                    'duration': (frequencies[codon] / len(frequencies)) * self.ratio
+                })
+
+            i += 1
+
+        return strings
+    
+    def acidic_codons(self, initial_octave, instrument) -> list:
+        codons = self.dna.codons()
+        frequencies = self.dna.frequency(codons)
+        acidic_codons = [
+            'GAT',
+            'GAC',
+            'GAA',
+            'GAG',
+        ]
+
+        mapping = Harmonics.map(
+            items=acidic_codons,
+            scale=self.scale,
+            initial_octave=initial_octave
+        )
+
+        mapping = Harmonics.to_midi(mapping)
+
+        strings = list()
+
+        i = 1
+        for codon in codons:
+            velocity = self.ratio * frequencies[codons[i - 1]] if i > 1 else 100
+            velocity = 127 if velocity > 127 else velocity
+            velocity = velocity + 60 if velocity < 80 else velocity
+
+            if codon in acidic_codons:
+                strings.append({
+                    'value': codon,
+                    'instrument': instrument,
+                    'note': mapping[codon],
+                    'velocity': int(velocity),
                     'time': (self.ratio) * i,
                     'duration': (frequencies[codon] / len(frequencies)) * self.ratio
                 })

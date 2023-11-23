@@ -8,6 +8,7 @@ $(document).ready(() => {
     const inputsInstruments = $('select[id^=inputInstruments_]')
     const inputsStrategies = $('select[id^=inputsStrategies_]')
     const inputsInitialOctaves = $('input[id^=inputInitialOctaves_]')
+    const liInstruments = $('[id^=liInstrument_]')
 
     const textMp3Filename = $('#textMp3Filename')
     const textMidiFilename = $('#textMidiFilename')
@@ -245,6 +246,10 @@ $(document).ready(() => {
 
         spinner.show()
         btnUpdateSonification.attr('disabled', true)
+        
+        liInstruments.each((i, li) => {
+            $(li).empty()
+        })
 
         let instruments = []
         
@@ -384,6 +389,7 @@ $(document).ready(() => {
         btnDownloadJsonFile.attr('href', data.json.url)
 
         inputsInstruments.each((i) => {
+            console.log(data.frames[i][0].instrument)
             $(inputsInstruments[i]).val(data.frames[i][0].instrument)
         })
 
