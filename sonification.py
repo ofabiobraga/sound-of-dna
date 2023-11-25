@@ -14,15 +14,15 @@ class Sonification:
             dna = Genoma(dna)
 
         self.dna = dna
-        self.instruments = instruments or [112, 32, 5, 75]
+        self.instruments = instruments or [0, 32, 5, 75]
         self.frequency = dna.frequency(dna.mononucleotides())
         self.duration = round(len(dna.sequence()) / (self.frequency['G'] + self.frequency['C']) * 100)
         self.ratio = dna.ratio()
         self.bmp = bmp or int(self.ratio * 200)
         self.scaleName = scale or 'default'
         self.scale = getattr(Scale, self.scaleName)()
-        self.strategies = strategies or ['apolar_codons', 'acidic_codons', 'polar_codons', 'basic_codons']
-        self.initial_octaves = initial_octaves or [2, 1, 4, 4]
+        self.strategies = strategies or ['apolar_codons', 'dinucleotides', 'polar_codons', 'basic_codons']
+        self.initial_octaves = initial_octaves or [5, 1, 4, 3]
         
     def process(self) -> dict:
         """
