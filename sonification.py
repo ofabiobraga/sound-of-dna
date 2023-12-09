@@ -18,7 +18,7 @@ class Sonification:
         self.frequency = dna.frequency(dna.mononucleotides())
         self.duration = round(len(dna.sequence()) / (self.frequency['G'] + self.frequency['C']) * 100)
         self.ratio = dna.ratio()
-        self.bmp = bmp or int(self.ratio * 200)
+        self.bpm = bmp or int(self.ratio * 200)
         self.scaleName = scale or 'default'
         self.scale = getattr(Scale, self.scaleName)()
         self.strategies = strategies or ['apolar_codons', 'dinucleotides', 'polar_codons', 'basic_codons']
@@ -38,14 +38,15 @@ class Sonification:
 
         # Building midi file
         midi = MIDIFile(
-            numTracks=len(frames)
+            numTracks=len(frames),
+            
         )
 
         channel = 0
         track = 0
 
         for strings in frames:
-            midi.addTempo(track=track, time=0, tempo=self.bmp)
+            midi.addTempo(track=track, time=0, tempo=self.bpm)
             midi.addProgramChange(track, channel, 0, int(self.instruments[track]))
 
             for string in strings:
@@ -73,7 +74,7 @@ class Sonification:
             'length': len(self.dna.sequence()),
             'gc/at': self.dna.ratio(),
             'scale': self.scaleName,
-            'bmp': self.bmp,
+            'bmp': self.bpm,
             'strategies': self.strategies,
             'initial_octaves': self.initial_octaves,
             'mp3': {
@@ -136,14 +137,18 @@ class Sonification:
                 
             if not stopped and codon in stop_codons:
                 stopped = True
+                
+            velocity = self.ratio * frequencies[codons[i - 1]] if i > 1 else 100
+            velocity = 127 if velocity > 127 else velocity
+            velocity = velocity + 80 if velocity < 80 else velocity
 
             if not stopped:
                 strings.append({
                     'value': codon,
                     'instrument': instrument,
                     'note': mapping[codon],
-                    'velocity': 100,
-                    'time': (self.ratio) * i,
+                    'velocity': int(velocity),
+                    'time': i,
                     'duration': (self.ratio)
                 })
 
@@ -169,14 +174,14 @@ class Sonification:
         for dinucleotide in dinucleotides:
             velocity = 32 + (frequencies[dinucleotides[i + 1]] / len(dinucleotides)) * 100 if i < len(dinucleotides) - 1 else 100
             velocity = 127 if velocity > 127 else velocity
-            velocity = velocity + 60 if velocity < 80 else velocity
+            velocity = velocity + 80 if velocity < 80 else velocity
             
             strings.append({
                 'value': dinucleotide,
                 'instrument': instrument,
                 'note': mapping[dinucleotide],
                 'velocity': int(velocity),
-                'time': (self.ratio) * i,
+                'time': i,
                 'duration': (self.ratio)
             })
 
@@ -222,7 +227,7 @@ class Sonification:
         for codon in codons:
             velocity = self.ratio * frequencies[codons[i - 1]] if i > 1 else 100
             velocity = 127 if velocity > 127 else velocity
-            velocity = velocity + 60 if velocity < 80 else velocity
+            velocity = velocity + 80 if velocity < 80 else velocity
 
             if codon in polar_codons:
                 strings.append({
@@ -230,7 +235,7 @@ class Sonification:
                     'instrument': instrument,
                     'note': mapping[codon],
                     'velocity': int(velocity),
-                    'time': (self.ratio) * i,
+                    'time': i,
                     'duration': (frequencies[codon] / len(frequencies)) * self.ratio
                 })
 
@@ -255,13 +260,17 @@ class Sonification:
 
         i = 1
         for codon in codons:
+            velocity = self.ratio * frequencies[codons[i - 1]] if i > 1 else 100
+            velocity = 127 if velocity > 127 else velocity
+            velocity = velocity + 80 if velocity < 80 else velocity
+
             if codon in basic_codons:
                 strings.append({
                     'value': codon,
                     'instrument': instrument,
                     'note': mapping[codon],
-                    'velocity': 100,
-                    'time': (self.ratio) * i,
+                    'velocity': int(velocity),
+                    'time': i,
                     'duration': (frequencies[codon] / len(frequencies)) * self.ratio
                 })
 
@@ -318,7 +327,7 @@ class Sonification:
         for codon in codons:
             velocity = self.ratio * frequencies[codons[i - 1]] if i > 1 else 100
             velocity = 127 if velocity > 127 else velocity
-            velocity = velocity + 60 if velocity < 80 else velocity
+            velocity = velocity + 80 if velocity < 80 else velocity
 
             if codon in apolar_codons:
                 strings.append({
@@ -326,7 +335,7 @@ class Sonification:
                     'instrument': instrument,
                     'note': mapping[codon],
                     'velocity': int(velocity),
-                    'time': (self.ratio) * i,
+                    'time': i,
                     'duration': (frequencies[codon] / len(frequencies)) * self.ratio
                 })
 
@@ -358,7 +367,7 @@ class Sonification:
         for codon in codons:
             velocity = self.ratio * frequencies[codons[i - 1]] if i > 1 else 100
             velocity = 127 if velocity > 127 else velocity
-            velocity = velocity + 60 if velocity < 80 else velocity
+            velocity = velocity + 80 if velocity < 80 else velocity
 
             if codon in acidic_codons:
                 strings.append({
@@ -366,7 +375,7 @@ class Sonification:
                     'instrument': instrument,
                     'note': mapping[codon],
                     'velocity': int(velocity),
-                    'time': (self.ratio) * i,
+                    'time': i,
                     'duration': (frequencies[codon] / len(frequencies)) * self.ratio
                 })
 

@@ -67,9 +67,8 @@ def graph_frequencies_high_low():
 
     # Configurações do gráfico
     plt.figure(figsize=(8, 4))
-    plt.plot(tempo, senoide_1, label='Mais agudo', linestyle='solid', color='black', linewidth=2)
-    plt.plot(tempo, senoide_2, label='Mais grave', linestyle='dashed', color='black', linewidth=1)
-    plt.title('Tom')
+    plt.plot(tempo, senoide_1, label='Mais grave', linestyle='solid', color='black', linewidth=2)
+    plt.plot(tempo, senoide_2, label='Mais agudo', linestyle='dashed', color='black', linewidth=1)
     plt.xlabel('Tempo')
     plt.ylabel('Amplitude')
     plt.xlim(-2 * np.pi/(frequencia*2), 2 * np.pi/(frequencia*2))
