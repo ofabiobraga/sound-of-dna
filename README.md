@@ -17,7 +17,7 @@ After that, the project is ready to be served and exposed on top of FastAPI. Jus
 make serve
 ```
 
-It can now be accessed from any web browser on the URL https://localhost:8000.
+It can now be accessed from any web browser on the URL http://localhost:8000.
 
 If you need to stop server, just run the command below.
 ```bash
