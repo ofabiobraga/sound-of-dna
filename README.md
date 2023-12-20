@@ -1,4 +1,5 @@
 # Sound of DNA
+![Screenshot of the system](static/img/screenshot.png)
 
 Prototype software implementing an algorithm to sonify genetic data in FASTA format. It's part of my graduation final project for the Computer Engineering course.
 
