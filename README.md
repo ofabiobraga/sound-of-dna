@@ -2,8 +2,9 @@
 ![Screenshot of the system](/static/img/screenshot.png)
 
 Prototype software implementing an algorithm to sonify genetic data in FASTA format. It's part of my graduation final project for the Computer Engineering course.
+You can find audio examples produced by the algorithm [here](https://github.com/ofabiobraga/sound-of-dna/tree/main/examples).
 
-## Pré-requisitos
+## Dependencies
 - Docker
 
 ### Get Started
